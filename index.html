@@ -3,37 +3,65 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Exemplos Claude IA — Primeiros Passos com o Claude</title>
+<title>Exemplos Interativos — Primeiros Passos com o Claude</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-body{margin:0;background:#faf9f6;color:#1a1a18;font-family:-apple-system,'Segoe UI',Arial,sans-serif;padding:48px 20px 80px;}
-.wrap{max-width:640px;margin:0 auto;}
-h1{font-size:26px;font-weight:700;margin:0 0 8px;}
-.sub{font-size:15px;color:#6b6a63;margin:0 0 32px;}
-ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;}
-li a{display:block;padding:16px 20px;border:1px solid #e6e4dd;border-radius:10px;text-decoration:none;color:#1a1a18;font-size:16px;font-weight:500;background:#fff;}
-li a:hover{border-color:#3d5a98;}
-footer{margin-top:40px;font-size:12px;color:#6b6a63;}
+:root{--bg:#faf9f6;--surface:#ffffff;--text:#0d0d0c;--muted:#6b6a63;--border:#e6e4dd;--pink:#dc1067;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,'Segoe UI',Arial,sans-serif;}
+.top{background:#000;padding:56px 24px 40px;}
+.top .wrap{max-width:920px;margin:0 auto;}
+.top img{height:44px;display:block;margin-bottom:28px;}
+.top h1{color:#fff;font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-0.01em;}
+.top p{color:#c8c8c8;font-size:16px;margin:0;}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px;}
+.section-title{font-size:13px;font-weight:600;color:var(--pink);text-transform:uppercase;letter-spacing:.05em;margin:44px 0 16px;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media (max-width:640px){.grid{grid-template-columns:1fr;}}
+a.card{display:block;padding:22px 24px;border:1px solid var(--border);border-radius:14px;text-decoration:none;color:var(--text);background:var(--surface);transition:border-color .15s;}
+a.card:hover{border-color:var(--pink);}
+a.card .name{font-size:16px;font-weight:600;margin:0 0 4px;}
+a.card .desc{font-size:13px;color:var(--muted);margin:0;}
+footer{max-width:920px;margin:56px auto 40px;padding:24px 24px 0;border-top:1px solid var(--border);font-size:13px;color:var(--muted);}
 </style>
 </head>
 <body>
+<div class="top">
 <div class="wrap">
-<h1>Exemplos Claude IA</h1>
-<p class="sub">Primeiros Passos com o Claude — NITeP, Formação Continuada</p>
-<ul>
-<li><a href="design-publicidade.html">Design e Publicidade — Paleta (simples)</a></li>
-<li><a href="design-publicidade-completo.html">Design e Publicidade — Paleta (completa)</a></li>
-<li><a href="estatistica.html">Estatística — Distribuição Normal</a></li>
-<li><a href="fisica.html">Física — Lançamento de Projétil</a></li>
-<li><a href="engenharia-aplicada.html">Engenharia Aplicada — Deflexão de Viga</a></li>
-<li><a href="direito.html">Direito — Linha do Tempo Processual</a></li>
-<li><a href="administracao.html">Administração — Ponto de Equilíbrio</a></li>
-<li><a href="psicologia.html">Psicologia — Estágios de Piaget</a></li>
-<li><a href="historia.html">História — Linha do Tempo por Período</a></li>
-<li><a href="enfermagem.html">Enfermagem — Triagem Manchester</a></li>
-<li><a href="biologia.html">Biologia — Ciclo Cardíaco</a></li>
-<li><a href="letras.html">Letras — Movimentos Literários</a></li>
-</ul>
-<footer>Gerado com Claude.</footer>
+<img src="nitep-logo.png" alt="NITeP">
+<h1>Exemplos interativos</h1>
+<p>Primeiros Passos com o Claude — Formação Continuada, Trilha Inteligência Artificial</p>
 </div>
+</div>
+
+<div class="wrap">
+<p class="section-title">Cursos técnicos</p>
+<div class="grid">
+<a class="card" href="estatistica.html"><p class="name">Estatística</p><p class="desc">Distribuição normal com média e desvio-padrão ajustáveis</p></a>
+<a class="card" href="fisica.html"><p class="name">Física</p><p class="desc">Lançamento de projétil com ângulo e velocidade</p></a>
+<a class="card" href="engenharia-aplicada.html"><p class="name">Engenharia Aplicada</p><p class="desc">Deflexão de uma viga biapoiada sob carga</p></a>
+</div>
+
+<p class="section-title">Cursos de humanas e saúde</p>
+<div class="grid">
+<a class="card" href="direito.html"><p class="name">Direito</p><p class="desc">Linha do tempo das fases de um processo judicial</p></a>
+<a class="card" href="administracao.html"><p class="name">Administração</p><p class="desc">Simulador de ponto de equilíbrio</p></a>
+<a class="card" href="psicologia.html"><p class="name">Psicologia</p><p class="desc">Estágios de desenvolvimento de Piaget por idade</p></a>
+<a class="card" href="historia.html"><p class="name">História</p><p class="desc">Linha do tempo de períodos históricos</p></a>
+<a class="card" href="enfermagem.html"><p class="name">Enfermagem</p><p class="desc">Classificação de risco no modelo Manchester</p></a>
+<a class="card" href="biologia.html"><p class="name">Biologia</p><p class="desc">Ciclo cardíaco com controle de batimentos</p></a>
+<a class="card" href="letras.html"><p class="name">Letras</p><p class="desc">Movimentos literários, do Barroco ao Contemporâneo</p></a>
+</div>
+
+<p class="section-title">Design e Publicidade</p>
+<div class="grid">
+<a class="card" href="design-publicidade.html"><p class="name">Paleta de cores — simples</p><p class="desc">Gerador de paleta aplicado a um mockup de anúncio</p></a>
+<a class="card" href="design-publicidade-completo.html"><p class="name">Paleta de cores — completa</p><p class="desc">Com checagem de contraste e dois mockups</p></a>
+</div>
+</div>
+
+<footer>Primeiros Passos com o Claude · NITeP · Formação Continuada</footer>
 </body>
 </html>
