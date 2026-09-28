@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Biologia — Ciclo Cardíaco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;--bg:#faf9f6;--surface:#ffffff;--text:#1a1a18;--muted:#6b6a63;--border:#e6e4dd;--accent:#3d5a98;--danger:#c8453a;--mono:'SFMono-Regular',Consolas,Menlo,monospace;--sans:'Inter',-apple-system,'Segoe UI',sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}}
+:root[data-theme="dark"]{--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);padding:40px 20px 60px;}
+.wrap{max-width:640px;margin:0 auto;}
+h1{font-size:22px;font-weight:600;margin:0 0 6px;letter-spacing:-0.01em;}
+.sub{font-size:14px;color:var(--muted);margin:0 0 24px;line-height:1.5;}
+.heartwrap{display:flex;flex-direction:column;align-items:center;gap:16px;padding:20px 0;}
+#phase{font-size:16px;font-weight:600;margin:0;}
+#bpmCat{font-size:13px;color:var(--muted);margin:0;}
+.control{display:flex;align-items:center;gap:12px;margin-top:8px;}
+.control label{font-size:13px;color:var(--muted);min-width:170px;}
+input[type=range]{flex:1;accent-color:var(--accent);}
+.out{font-size:13px;font-weight:500;min-width:70px;text-align:right;}
+@keyframes heartbeat { 0%,100%{transform:scale(1);} 25%{transform:scale(1.18);} 45%{transform:scale(1);} }
+#heartSvg { animation: heartbeat 1s ease-in-out infinite; transform-origin:center; }
+@media (prefers-reduced-motion: reduce) { #heartSvg { animation: none; } }
+h2.section{font-size:12px;color:var(--muted);margin:32px 0 12px;text-transform:uppercase;letter-spacing:.04em;}
+.promptbox{border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-size:13px;line-height:1.55;margin-bottom:12px;background:var(--surface);}
+.promptbox .tag{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px;display:block;}
+footer{margin-top:40px;font-size:12px;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Biologia — Ciclo Cardíaco</h1>
+<p class="sub">Ajuste os batimentos por minuto e veja o coração pulsar em sístole e diástole no ritmo escolhido.</p>
+
+<div class="heartwrap">
+<svg id="heartSvg" width="140" height="140" viewBox="0 0 140 140">
+<path d="M70,120 C20,85 10,50 35,30 C55,15 70,30 70,45 C70,30 85,15 105,30 C130,50 120,85 70,120 Z" fill="var(--danger)"/>
+</svg>
+<p id="phase"></p>
+<p id="bpmCat"></p>
+</div>
+
+<div class="control"><label for="bpm">Batimentos por minuto</label><input type="range" id="bpm" min="40" max="180" step="1" value="75"><span class="out" id="bpmOut"></span></div>
+
+<h2 class="section">Prompt simples</h2>
+<div class="promptbox"><span class="tag">Básico</span>"Faça uma animação interativa do ciclo cardíaco, com um controle de velocidade dos batimentos."</div>
+
+<h2 class="section">Prompt detalhado</h2>
+<div class="promptbox"><span class="tag">Desenvolvido</span>"Faça uma simulação interativa para a disciplina de Biologia sobre o ciclo cardíaco. O usuário controla os batimentos por minuto (BPM) com um slider de 40 a 180; um ícone de coração deve pulsar no ritmo escolhido, alternando visualmente entre as fases de sístole (contração) e diástole (relaxamento), e o sistema deve indicar a categoria (bradicardia, faixa normal de repouso, taquicardia). Nível: básico, para associar visualmente frequência cardíaca e ritmo, sem entrar em detalhes de eletrofisiologia."</div>
+
+<footer>Protótipo gerado com Claude — parte da oficina Primeiros Passos com o Claude.</footer>
+</div>
+<script>
+(function(){
+var bpmS=document.getElementById('bpm'), bpmOut=document.getElementById('bpmOut');
+var heartSvg=document.getElementById('heartSvg'), phase=document.getElementById('phase'), bpmCat=document.getElementById('bpmCat');
+var phaseInterval=null;
+function update(){
+var bpm=parseFloat(bpmS.value);
+bpmOut.textContent=bpm+' bpm';
+var dur=(60/bpm);
+heartSvg.style.animationDuration=dur+'s';
+var cat = bpm<60 ? 'Bradicardia (abaixo do normal em repouso)' : bpm<=100 ? 'Faixa normal de repouso' : 'Taquicardia (acima do normal em repouso)';
+bpmCat.textContent=cat;
+if(phaseInterval) clearInterval(phaseInterval);
+var toggling=true;
+phase.textContent='Sístole (contração)';
+phaseInterval=setInterval(function(){
+toggling=!toggling;
+phase.textContent = toggling ? 'Sístole (contração)' : 'Diástole (relaxamento)';
+}, dur*1000/2);
+}
+bpmS.addEventListener('input',update);
+update();
+})();
+</script>
+</body>
+</html>

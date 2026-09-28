@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Enfermagem — Triagem Manchester</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;--bg:#faf9f6;--surface:#ffffff;--text:#1a1a18;--muted:#6b6a63;--border:#e6e4dd;--accent:#3d5a98;--mono:'SFMono-Regular',Consolas,Menlo,monospace;--sans:'Inter',-apple-system,'Segoe UI',sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}}
+:root[data-theme="dark"]{--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);padding:40px 20px 60px;}
+.wrap{max-width:640px;margin:0 auto;}
+h1{font-size:22px;font-weight:600;margin:0 0 6px;letter-spacing:-0.01em;}
+.sub{font-size:14px;color:var(--muted);margin:0 0 24px;line-height:1.5;}
+input[type=range]{width:100%;accent-color:var(--accent);}
+.scale{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin:6px 0 20px;}
+.card{border-radius:12px;padding:24px;text-align:center;}
+.card p.label{font-size:20px;font-weight:700;margin:0 0 6px;color:#ffffff;}
+.card p.time{font-size:14px;margin:0;color:#ffffff;}
+#desc{font-size:13px;color:var(--muted);margin-top:14px;line-height:1.5;}
+.note{font-size:11px;color:var(--muted);margin-top:10px;}
+h2.section{font-size:12px;color:var(--muted);margin:32px 0 12px;text-transform:uppercase;letter-spacing:.04em;}
+.promptbox{border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-size:13px;line-height:1.55;margin-bottom:12px;background:var(--surface);}
+.promptbox .tag{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px;display:block;}
+footer{margin-top:40px;font-size:12px;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Enfermagem/Saúde — Classificação de Risco</h1>
+<p class="sub">Ajuste a gravidade e veja a cor de prioridade e o tempo alvo de atendimento, no modelo Manchester.</p>
+
+<input type="range" id="sev" min="1" max="5" step="1" value="3" aria-label="Nível de gravidade">
+<div class="scale"><span>Menos grave</span><span>Mais grave</span></div>
+
+<div class="card" id="card">
+<p class="label" id="label"></p>
+<p class="time" id="time"></p>
+</div>
+<p id="desc"></p>
+<p class="note">Simplificação didática do Protocolo de Manchester — não substitui a classificação clínica real.</p>
+
+<h2 class="section">Prompt simples</h2>
+<div class="promptbox"><span class="tag">Básico</span>"Faça um fluxograma interativo de triagem no modelo Manchester, com as cores de prioridade."</div>
+
+<h2 class="section">Prompt detalhado</h2>
+<div class="promptbox"><span class="tag">Desenvolvido</span>"Faça uma simulação interativa para a disciplina de Enfermagem sobre o Protocolo de Manchester de classificação de risco. O usuário ajusta a gravidade percebida com um slider de 1 a 5; o sistema deve mostrar a cor de prioridade correspondente (azul, verde, amarelo, laranja, vermelho), o nome da categoria e o tempo-alvo de atendimento de cada uma. Deixe claro que é uma simplificação didática e não substitui a avaliação clínica real. Nível: básico, para ensinar a lógica das cores, não os critérios clínicos completos."</div>
+
+<footer>Protótipo gerado com Claude — parte da oficina Primeiros Passos com o Claude.</footer>
+</div>
+<script>
+(function(){
+var levels=[
+{c:'#2E7DD9', n:'Azul — Não urgente', t:'Alvo: até 240 min', d:'Situação sem risco imediato, atendimento pode aguardar com segurança.'},
+{c:'#2FA35A', n:'Verde — Pouco urgente', t:'Alvo: até 120 min', d:'Queixa estável, sem sinais de gravidade no momento.'},
+{c:'#D9B32E', n:'Amarelo — Urgente', t:'Alvo: até 60 min', d:'Necessita avaliação e atendimento em tempo moderado.'},
+{c:'#E0722E', n:'Laranja — Muito urgente', t:'Alvo: até 10 min', d:'Risco importante, atendimento prioritário e rápido.'},
+{c:'#D9362E', n:'Vermelho — Emergência', t:'Atendimento imediato', d:'Risco iminente de vida — vai direto para atendimento.'}
+];
+var slider=document.getElementById('sev');
+var card=document.getElementById('card'), label=document.getElementById('label'), timeEl=document.getElementById('time'), desc=document.getElementById('desc');
+function update(){
+var lvl=levels[parseInt(slider.value,10)-1];
+card.style.background=lvl.c; label.textContent=lvl.n; timeEl.textContent=lvl.t; desc.textContent=lvl.d;
+}
+slider.addEventListener('input',update);
+update();
+})();
+</script>
+</body>
+</html>

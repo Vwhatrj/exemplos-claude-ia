@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Direito — Linha do Tempo Processual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;--bg:#faf9f6;--surface:#ffffff;--text:#1a1a18;--muted:#6b6a63;--border:#e6e4dd;--accent:#3d5a98;--mono:'SFMono-Regular',Consolas,Menlo,monospace;--sans:'Inter',-apple-system,'Segoe UI',sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}}
+:root[data-theme="dark"]{--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);padding:40px 20px 60px;}
+.wrap{max-width:640px;margin:0 auto;}
+h1{font-size:22px;font-weight:600;margin:0 0 6px;letter-spacing:-0.01em;}
+.sub{font-size:14px;color:var(--muted);margin:0 0 28px;line-height:1.5;}
+input[type=range]{width:100%;accent-color:var(--accent);margin-top:12px;}
+.card{border-radius:10px;border:1px solid var(--border);padding:20px;margin-top:20px;}
+.card p.name{font-size:16px;font-weight:600;margin:0 0 4px;}
+.card p.prazo{font-size:13px;color:var(--muted);margin:0 0 10px;}
+.card p.desc{font-size:14px;line-height:1.5;margin:0;}
+.note{font-size:11px;color:var(--muted);margin-top:14px;}
+h2.section{font-size:12px;color:var(--muted);margin:32px 0 12px;text-transform:uppercase;letter-spacing:.04em;}
+.promptbox{border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-size:13px;line-height:1.55;margin-bottom:12px;background:var(--surface);}
+.promptbox .tag{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px;display:block;}
+footer{margin-top:40px;font-size:12px;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Direito — Linha do Tempo Processual</h1>
+<p class="sub">Mova o controle e veja cada fase de um processo judicial e seu prazo típico.</p>
+
+<div style="position:relative;height:4px;background:var(--border);border-radius:2px;margin-top:30px;">
+<div id="track" style="position:absolute;left:0;top:0;height:4px;background:var(--accent);border-radius:2px;width:0%;"></div>
+</div>
+<input type="range" id="stage" min="0" max="5" step="1" value="0" aria-label="Fase do processo">
+
+<div class="card">
+<p class="name" id="stageName"></p>
+<p class="prazo" id="stagePrazo"></p>
+<p class="desc" id="stageDesc"></p>
+</div>
+<p class="note">Prazos ilustrativos do rito comum (CPC); variam conforme o tipo de ação.</p>
+
+<h2 class="section">Prompt simples</h2>
+<div class="promptbox"><span class="tag">Básico</span>"Faça uma linha do tempo interativa das fases de um processo judicial, com os prazos de cada etapa."</div>
+
+<h2 class="section">Prompt detalhado</h2>
+<div class="promptbox"><span class="tag">Desenvolvido</span>"Faça uma simulação interativa para a disciplina de Direito Processual sobre as fases de um processo judicial no rito comum. O usuário navega pelas fases (petição inicial, citação, contestação, instrução, sentença, recurso) com um slider; cada fase deve mostrar o nome, o prazo típico e uma breve descrição do que acontece nela. Deixe claro que os prazos são ilustrativos e variam por tipo de ação. Nível: básico, para dar visão geral do rito, não substituindo estudo detalhado do CPC."</div>
+
+<footer>Protótipo gerado com Claude — parte da oficina Primeiros Passos com o Claude.</footer>
+</div>
+<script>
+(function(){
+var stages=[
+{n:'Petição inicial', p:'Dia 0', d:'A parte autora protocola a ação, apresentando os fatos e o pedido.'},
+{n:'Citação', p:'Até ~15 dias', d:'O réu é formalmente notificado do processo e chamado a se manifestar.'},
+{n:'Contestação', p:'15 dias úteis', d:'O réu apresenta sua defesa, contestando os fatos e pedidos.'},
+{n:'Instrução', p:'Prazo variável', d:'Produção de provas: documentos, testemunhas, perícias.'},
+{n:'Sentença', p:'Prazo variável', d:'O juiz analisa o processo e profere a decisão.'},
+{n:'Recurso (Apelação)', p:'15 dias úteis', d:'A parte que perdeu pode recorrer da sentença a uma instância superior.'}
+];
+var slider=document.getElementById('stage');
+var track=document.getElementById('track');
+var nameEl=document.getElementById('stageName'), prazoEl=document.getElementById('stagePrazo'), descEl=document.getElementById('stageDesc');
+function update(){
+var idx=parseInt(slider.value,10);
+track.style.width=(idx/(stages.length-1)*100)+'%';
+nameEl.textContent=stages[idx].n;
+prazoEl.textContent='Prazo típico: '+stages[idx].p;
+descEl.textContent=stages[idx].d;
+}
+slider.addEventListener('input',update);
+update();
+})();
+</script>
+</body>
+</html>

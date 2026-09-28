@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Engenharia — Deflexão de Viga</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;--bg:#faf9f6;--surface:#ffffff;--text:#1a1a18;--muted:#6b6a63;--border:#e6e4dd;--accent:#3d5a98;--danger:#c8453a;--mono:'SFMono-Regular',Consolas,Menlo,monospace;--sans:'Inter',-apple-system,'Segoe UI',sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}}
+:root[data-theme="dark"]{--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);padding:40px 20px 60px;}
+.wrap{max-width:640px;margin:0 auto;}
+h1{font-size:22px;font-weight:600;margin:0 0 6px;letter-spacing:-0.01em;}
+.sub{font-size:14px;color:var(--muted);margin:0 0 28px;line-height:1.5;}
+svg{width:100%;height:auto;display:block;margin-bottom:16px;}
+.control{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.control label{font-size:13px;color:var(--muted);min-width:110px;}
+input[type=range]{flex:1;accent-color:var(--accent);}
+.out{font-size:13px;font-weight:500;min-width:60px;text-align:right;}
+.note{font-size:12px;color:var(--muted);margin-top:8px;}
+h2.section{font-size:12px;color:var(--muted);margin:32px 0 12px;text-transform:uppercase;letter-spacing:.04em;}
+.promptbox{border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-size:13px;line-height:1.55;margin-bottom:12px;background:var(--surface);}
+.promptbox .tag{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px;display:block;}
+footer{margin-top:40px;font-size:12px;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Engenharia Aplicada — Deflexão de Viga</h1>
+<p class="sub">Ajuste a carga e o vão de uma viga biapoiada e veja a linha elástica se curvar.</p>
+
+<svg id="chart" viewBox="0 0 640 220" role="img">
+<title>Deflexão de viga biapoiada</title>
+<path id="ref" d="" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 4" fill="none"/>
+<path id="beam" d="" stroke="var(--accent)" stroke-width="3" fill="none" stroke-linecap="round"/>
+<polygon id="supL" points="" fill="var(--muted)"/>
+<polygon id="supR" points="" fill="var(--muted)"/>
+<line id="loadLine" x1="0" y1="0" x2="0" y2="0" stroke="var(--danger)" stroke-width="2.5" marker-end="url(#arrow)"/>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="4" refY="7" orient="auto"><path d="M0,0 L8,0 L4,8 Z" fill="var(--danger)"/></marker></defs>
+</svg>
+
+<div class="control"><label for="load">Carga (P)</label><input type="range" id="load" min="1" max="50" step="1" value="20"><span class="out" id="loadOut">20 kN</span></div>
+<div class="control"><label for="span">Vão (L)</label><input type="range" id="span" min="2" max="12" step="0.5" value="6"><span class="out" id="spanOut">6 m</span></div>
+<p class="note">Deformação ampliada para visualização — não representa unidades reais de EI.</p>
+
+<h2 class="section">Prompt simples</h2>
+<div class="promptbox"><span class="tag">Básico</span>"Faça um simulador interativo de deflexão de uma viga biapoiada, com sliders de carga e vão, mostrando a linha elástica se curvando."</div>
+
+<h2 class="section">Prompt detalhado</h2>
+<div class="promptbox"><span class="tag">Desenvolvido</span>"Faça uma simulação interativa para a disciplina de Resistência dos Materiais sobre deflexão de uma viga biapoiada com carga concentrada no meio do vão. O usuário controla a carga (P) e o vão (L) com sliders; a linha elástica deve se curvar usando a fórmula de deflexão de viga simplesmente apoiada, com a deformação escalada para visualização (deixe claro que não são unidades reais de EI). Mostre os apoios nas extremidades e a seta da carga no ponto de aplicação. Nível: básico, focado na relação visual entre carga/vão e a curvatura."</div>
+
+<footer>Protótipo gerado com Claude — parte da oficina Primeiros Passos com o Claude.</footer>
+</div>
+<script>
+(function(){
+var loadS=document.getElementById('load'), spanS=document.getElementById('span');
+var loadOut=document.getElementById('loadOut'), spanOut=document.getElementById('spanOut');
+var beam=document.getElementById('beam'), ref=document.getElementById('ref');
+var supL=document.getElementById('supL'), supR=document.getElementById('supR'), loadLine=document.getElementById('loadLine');
+var x0=70, x1=570, y=110, C=0.00104;
+function f(x,L){ return x*(3*L*L-4*x*x); }
+function update(){
+var P=parseFloat(loadS.value), L=parseFloat(spanS.value);
+loadOut.textContent=P+' kN'; spanOut.textContent=L+' m';
+var n=40, pts=[];
+for(var i=0;i<=n;i++){
+var x=L*i/n;
+var xh = x<=L/2 ? x : L-x;
+var defl = C*P*f(xh,L);
+var px = x0+(x/L)*(x1-x0);
+var py = y+defl;
+pts.push(px+','+py);
+}
+beam.setAttribute('d','M'+pts.join(' L'));
+ref.setAttribute('d','M'+x0+','+y+' L'+x1+','+y);
+supL.setAttribute('points',(x0-10)+','+(y+16)+' '+(x0+10)+','+(y+16)+' '+x0+','+y);
+supR.setAttribute('points',(x1-10)+','+(y+16)+' '+(x1+10)+','+(y+16)+' '+x1+','+y);
+var midDefl = C*P*f(L/2,L);
+var midX = x0+(x1-x0)/2;
+loadLine.setAttribute('x1',midX); loadLine.setAttribute('y1', y-40);
+loadLine.setAttribute('x2',midX); loadLine.setAttribute('y2', y+midDefl-4);
+}
+loadS.addEventListener('input',update);
+spanS.addEventListener('input',update);
+update();
+})();
+</script>
+</body>
+</html>

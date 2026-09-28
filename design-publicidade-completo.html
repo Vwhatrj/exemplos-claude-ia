@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Design — Paleta de Cores (versão completa)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;--bg:#faf9f6;--surface:#ffffff;--text:#1a1a18;--muted:#6b6a63;--border:#e6e4dd;--accent:#3d5a98;--good:#2a9d6f;--warn:#c8453a;--mono:'SFMono-Regular',Consolas,Menlo,monospace;--sans:'Inter',-apple-system,'Segoe UI',sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}}
+:root[data-theme="dark"]{--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);padding:40px 20px 60px;}
+.wrap{max-width:660px;margin:0 auto;}
+h1{font-size:22px;font-weight:600;margin:0 0 6px;letter-spacing:-0.01em;}
+.sub{font-size:14px;color:var(--muted);margin:0 0 28px;line-height:1.5;}
+.control{display:flex;align-items:center;gap:14px;margin-bottom:28px;}
+.control label{font-size:13px;color:var(--muted);white-space:nowrap;}
+input[type=range]{flex:1;accent-color:var(--accent);}
+.hueval{font-family:var(--mono);font-size:13px;min-width:42px;text-align:right;}
+h2.section{font-size:12px;color:var(--muted);margin:32px 0 12px;text-transform:uppercase;letter-spacing:.04em;}
+.swatches{display:flex;gap:12px;flex-wrap:wrap;}
+.swatch{flex:1 1 110px;text-align:center;}
+.chip{height:64px;border-radius:6px;border:1px solid var(--border);}
+.swatch .label{font-size:12px;font-weight:500;margin-top:8px;}
+.swatch .use{font-size:11px;color:var(--muted);margin-top:1px;}
+.swatch .hex{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:3px;}
+.contrast{border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-size:13px;display:flex;justify-content:space-between;align-items:center;margin-top:14px;}
+.contrast b{font-family:var(--mono);}
+.tag-good{color:var(--good);font-weight:500;}
+.tag-bad{color:var(--warn);font-weight:500;}
+.mock1{border-radius:10px;padding:26px;max-width:340px;border:1px solid var(--border);}
+.mock1 h3{font-size:16px;font-weight:600;margin:0 0 8px;}
+.mock1 p{font-size:13px;line-height:1.55;margin:0 0 16px;}
+.mock1 button{border:none;padding:9px 18px;border-radius:6px;font-size:13px;font-weight:500;font-family:var(--sans);cursor:pointer;}
+.mock2{border-radius:10px;border:1px solid var(--border);display:flex;align-items:center;padding:12px 18px;gap:18px;}
+.mock2 .dot{width:20px;height:20px;border-radius:50%;flex-shrink:0;}
+.mock2 nav{display:flex;gap:16px;font-size:13px;flex:1;}
+.mock2 button{border:none;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:500;font-family:var(--sans);cursor:pointer;}
+footer{margin-top:40px;font-size:12px;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Gerador de paleta — versão completa</h1>
+<p class="sub">Mesma ideia da versão simples, com checagem de contraste (WCAG) e a paleta aplicada em dois contextos diferentes.</p>
+
+<div class="control"><label for="hue">Matiz</label><input type="range" id="hue" min="0" max="360" step="1" value="200"><span class="hueval" id="hueOut">200°</span></div>
+
+<h2 class="section">Paleta e uso sugerido</h2>
+<div class="swatches" id="swatches"></div>
+<div class="contrast">
+<span>Contraste texto/fundo (Escura sobre Clara)</span>
+<span><b id="contrastVal"></b> <span id="contrastTag"></span></span>
+</div>
+
+<h2 class="section">Aplicação 1 — cartão de anúncio</h2>
+<div class="mock1" id="card">
+<h3 id="cardTitle">Título do anúncio</h3>
+<p id="cardBody">Descrição curta do produto ou serviço aqui.</p>
+<button id="cardBtn">Saiba mais</button>
+</div>
+
+<h2 class="section">Aplicação 2 — barra de navegação</h2>
+<div class="mock2" id="nav">
+<div class="dot" id="navDot"></div>
+<nav id="navLinks"><span>Início</span><span>Produtos</span><span>Sobre</span></nav>
+<button id="navBtn">Entrar</button>
+</div>
+
+<footer>Protótipo gerado com Claude — versão completa, parte da oficina Primeiros Passos com o Claude.</footer>
+</div>
+<script>
+(function(){
+var hue=document.getElementById('hue'), hueOut=document.getElementById('hueOut');
+var swatchesEl=document.getElementById('swatches');
+var contrastVal=document.getElementById('contrastVal'), contrastTag=document.getElementById('contrastTag');
+var cardEl=document.getElementById('card'), cardTitle=document.getElementById('cardTitle'), cardBody=document.getElementById('cardBody'), cardBtn=document.getElementById('cardBtn');
+var navEl=document.getElementById('nav'), navDot=document.getElementById('navDot'), navLinks=document.getElementById('navLinks'), navBtn=document.getElementById('navBtn');
+
+function hslToHex(h,s,l){
+s/=100; l/=100;
+function k(n){return (n+h/30)%12;}
+var a=s*Math.min(l,1-l);
+function f(n){return l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));}
+function toHex(x){var v=Math.round(255*x).toString(16); return v.length===1?'0'+v:v;}
+return '#'+toHex(f(0))+toHex(f(8))+toHex(f(4));
+}
+function hexToRgb(hex){ var v=parseInt(hex.slice(1),16); return [(v>>16)&255,(v>>8)&255,v&255]; }
+function relLum(hex){
+var rgb=hexToRgb(hex).map(function(c){ c/=255; return c<=0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055,2.4); });
+return 0.2126*rgb[0]+0.7152*rgb[1]+0.0722*rgb[2];
+}
+function contrastRatio(h1,h2){
+var L1=relLum(h1), L2=relLum(h2);
+var lighter=Math.max(L1,L2), darker=Math.min(L1,L2);
+return (lighter+0.05)/(darker+0.05);
+}
+
+function render(h){
+h=((h%360)+360)%360;
+var palette=[
+{label:'Base', use:'Botões e destaques', hex:hslToHex(h,65,55)},
+{label:'Clara', use:'Fundo', hex:hslToHex(h,45,90)},
+{label:'Escura', use:'Texto', hex:hslToHex(h,55,25)},
+{label:'Complementar', use:'Ícones e contraste', hex:hslToHex((h+180)%360,60,50)},
+{label:'Destaque', use:'Hover e links', hex:hslToHex((h+30)%360,70,60)}
+];
+swatchesEl.innerHTML='';
+palette.forEach(function(p){
+var col=document.createElement('div'); col.className='swatch';
+var box=document.createElement('div'); box.className='chip'; box.style.background=p.hex;
+var lbl=document.createElement('div'); lbl.className='label'; lbl.textContent=p.label;
+var use=document.createElement('div'); use.className='use'; use.textContent=p.use;
+var hx=document.createElement('div'); hx.className='hex'; hx.textContent=p.hex;
+col.appendChild(box); col.appendChild(lbl); col.appendChild(use); col.appendChild(hx);
+swatchesEl.appendChild(col);
+});
+
+var ratio=contrastRatio(palette[1].hex, palette[2].hex);
+contrastVal.textContent=ratio.toFixed(1)+':1';
+if(ratio>=4.5){ contrastTag.textContent='Bom para texto (AA)'; contrastTag.className='tag-good'; }
+else if(ratio>=3){ contrastTag.textContent='Só para texto grande'; contrastTag.className='tag-good'; }
+else { contrastTag.textContent='Contraste baixo'; contrastTag.className='tag-bad'; }
+
+cardEl.style.background=palette[1].hex;
+cardTitle.style.color=palette[2].hex; cardBody.style.color=palette[2].hex;
+cardBtn.style.background=palette[0].hex; cardBtn.style.color='#ffffff';
+
+navEl.style.background=palette[1].hex;
+navDot.style.background=palette[0].hex;
+navLinks.style.color=palette[2].hex;
+navBtn.style.background=palette[3].hex; navBtn.style.color='#ffffff';
+
+hueOut.textContent=Math.round(h)+'°';
+}
+hue.addEventListener('input', function(){ render(parseFloat(hue.value)); });
+render(200);
+})();
+</script>
+</body>
+</html>

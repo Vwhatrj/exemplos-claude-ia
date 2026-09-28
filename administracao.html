@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Administração — Ponto de Equilíbrio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;--bg:#faf9f6;--surface:#ffffff;--text:#1a1a18;--muted:#6b6a63;--border:#e6e4dd;--accent:#3d5a98;--danger:#c8453a;--mono:'SFMono-Regular',Consolas,Menlo,monospace;--sans:'Inter',-apple-system,'Segoe UI',sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}}
+:root[data-theme="dark"]{--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);padding:40px 20px 60px;}
+.wrap{max-width:640px;margin:0 auto;}
+h1{font-size:22px;font-weight:600;margin:0 0 6px;letter-spacing:-0.01em;}
+.sub{font-size:14px;color:var(--muted);margin:0 0 24px;line-height:1.5;}
+svg{width:100%;height:auto;display:block;}
+.legend{display:flex;gap:20px;font-size:13px;color:var(--muted);margin:8px 0 20px;}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;}
+.control{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.control label{font-size:13px;color:var(--muted);min-width:150px;}
+input[type=range]{flex:1;accent-color:var(--accent);}
+.out{font-size:13px;font-weight:500;min-width:90px;text-align:right;}
+#result{font-size:14px;font-weight:500;margin-top:16px;}
+h2.section{font-size:12px;color:var(--muted);margin:32px 0 12px;text-transform:uppercase;letter-spacing:.04em;}
+.promptbox{border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-size:13px;line-height:1.55;margin-bottom:12px;background:var(--surface);}
+.promptbox .tag{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px;display:block;}
+footer{margin-top:40px;font-size:12px;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Administração/Marketing — Ponto de Equilíbrio</h1>
+<p class="sub">Ajuste preço, custo variável e custo fixo e veja onde receita e custo total se cruzam.</p>
+
+<svg id="chart" viewBox="0 0 640 300" role="img">
+<title>Ponto de equilíbrio</title>
+<line x1="60" y1="260" x2="620" y2="260" stroke="var(--border)" stroke-width="1"/>
+<line x1="60" y1="40" x2="60" y2="260" stroke="var(--border)" stroke-width="1"/>
+<line id="revLine" x1="0" y1="0" x2="0" y2="0" style="stroke:var(--accent);stroke-width:2.5"/>
+<line id="costLine" x1="0" y1="0" x2="0" y2="0" style="stroke:var(--danger);stroke-width:2.5"/>
+<circle id="marker" cx="0" cy="0" r="5" fill="var(--text)" opacity="0"/>
+<line id="markerX" x1="0" y1="0" x2="0" y2="0" stroke="var(--text)" stroke-width="1" stroke-dasharray="3 3" opacity="0"/>
+</svg>
+<div class="legend"><span><i style="background:var(--accent)"></i>Receita</span><span><i style="background:var(--danger)"></i>Custo total</span></div>
+
+<div class="control"><label for="price">Preço unitário</label><input type="range" id="price" min="10" max="200" step="5" value="80"><span class="out" id="priceOut"></span></div>
+<div class="control"><label for="varc">Custo variável/un.</label><input type="range" id="varc" min="5" max="150" step="5" value="40"><span class="out" id="varcOut"></span></div>
+<div class="control"><label for="fixc">Custo fixo</label><input type="range" id="fixc" min="500" max="20000" step="250" value="5000"><span class="out" id="fixcOut"></span></div>
+<p id="result"></p>
+
+<h2 class="section">Prompt simples</h2>
+<div class="promptbox"><span class="tag">Básico</span>"Faça um simulador interativo de ponto de equilíbrio com sliders de preço, custo variável e custo fixo."</div>
+
+<h2 class="section">Prompt detalhado</h2>
+<div class="promptbox"><span class="tag">Desenvolvido</span>"Faça uma simulação interativa para a disciplina de Administração/Marketing sobre ponto de equilíbrio (break-even). O usuário controla preço unitário, custo variável unitário e custo fixo com três sliders; um gráfico deve mostrar as retas de receita total e custo total se cruzando, marcando visualmente o ponto de equilíbrio e informando a quantidade e o valor em reais nesse ponto. Trate o caso em que o custo variável é maior ou igual ao preço (sem ponto de equilíbrio possível). Nível: básico, para ilustrar a relação entre preço/custo/lucro."</div>
+
+<footer>Protótipo gerado com Claude — parte da oficina Primeiros Passos com o Claude.</footer>
+</div>
+<script>
+(function(){
+var priceS=document.getElementById('price'), varcS=document.getElementById('varc'), fixcS=document.getElementById('fixc');
+var priceOut=document.getElementById('priceOut'), varcOut=document.getElementById('varcOut'), fixcOut=document.getElementById('fixcOut');
+var revLine=document.getElementById('revLine'), costLine=document.getElementById('costLine');
+var marker=document.getElementById('marker'), markerX=document.getElementById('markerX');
+var resultEl=document.getElementById('result');
+var x0=60, x1=620, y0=260, y1=40;
+function fmt(v){ return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}); }
+function update(){
+var price=parseFloat(priceS.value), varc=parseFloat(varcS.value), fixc=parseFloat(fixcS.value);
+priceOut.textContent=fmt(price); varcOut.textContent=fmt(varc); fixcOut.textContent=fmt(fixc);
+var valid = price>varc;
+var qBE = valid ? fixc/(price-varc) : null;
+var maxQ = valid ? Math.max(qBE*1.6, 10) : 200;
+var maxY = Math.max(price*maxQ, fixc+varc*maxQ);
+function sx(q){ return x0+(q/maxQ)*(x1-x0); }
+function sy(v){ return y0-(v/maxY)*(y0-y1); }
+revLine.setAttribute('x1',sx(0)); revLine.setAttribute('y1',sy(0));
+revLine.setAttribute('x2',sx(maxQ)); revLine.setAttribute('y2',sy(price*maxQ));
+costLine.setAttribute('x1',sx(0)); costLine.setAttribute('y1',sy(fixc));
+costLine.setAttribute('x2',sx(maxQ)); costLine.setAttribute('y2',sy(fixc+varc*maxQ));
+if(valid){
+marker.setAttribute('cx',sx(qBE)); marker.setAttribute('cy',sy(price*qBE)); marker.style.opacity=1;
+markerX.setAttribute('x1',sx(qBE)); markerX.setAttribute('y1',sy(price*qBE));
+markerX.setAttribute('x2',sx(qBE)); markerX.setAttribute('y2',y0); markerX.style.opacity=1;
+resultEl.textContent='Ponto de equilíbrio: '+Math.ceil(qBE)+' unidades ('+fmt(price*qBE)+' em receita).';
+}else{
+marker.style.opacity=0; markerX.style.opacity=0;
+resultEl.textContent='Custo variável maior ou igual ao preço: não existe ponto de equilíbrio (prejuízo em qualquer quantidade).';
+}
+}
+[priceS,varcS,fixcS].forEach(function(s){ s.addEventListener('input',update); });
+update();
+})();
+</script>
+</body>
+</html>

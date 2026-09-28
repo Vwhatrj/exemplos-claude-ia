@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Física — Lançamento de Projétil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;--bg:#faf9f6;--surface:#ffffff;--text:#1a1a18;--muted:#6b6a63;--border:#e6e4dd;--accent:#3d5a98;--danger:#c8453a;--mono:'SFMono-Regular',Consolas,Menlo,monospace;--sans:'Inter',-apple-system,'Segoe UI',sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}}
+:root[data-theme="dark"]{--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);padding:40px 20px 60px;}
+.wrap{max-width:640px;margin:0 auto;}
+h1{font-size:22px;font-weight:600;margin:0 0 6px;letter-spacing:-0.01em;}
+.sub{font-size:14px;color:var(--muted);margin:0 0 28px;line-height:1.5;}
+svg{width:100%;height:auto;display:block;margin-bottom:16px;}
+.control{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.control label{font-size:13px;color:var(--muted);min-width:150px;}
+input[type=range]{flex:1;accent-color:var(--accent);}
+.out{font-size:13px;font-weight:500;min-width:70px;text-align:right;}
+button{font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.5rem 1rem;cursor:pointer;font-size:13px;}
+button:hover{border-color:var(--accent);}
+#stats{font-size:13px;color:var(--muted);margin-left:14px;}
+h2.section{font-size:12px;color:var(--muted);margin:32px 0 12px;text-transform:uppercase;letter-spacing:.04em;}
+.promptbox{border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-size:13px;line-height:1.55;margin-bottom:12px;background:var(--surface);}
+.promptbox .tag{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px;display:block;}
+footer{margin-top:40px;font-size:12px;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Física — Lançamento de Projétil</h1>
+<p class="sub">Ajuste o ângulo e a velocidade inicial e veja a trajetória e o alcance mudarem.</p>
+
+<svg id="chart" viewBox="0 0 640 320" role="img">
+<title>Trajetória de projétil</title>
+<line x1="40" y1="280" x2="620" y2="280" stroke="var(--border)" stroke-width="1"/>
+<path id="traj" d="" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="5 5" opacity="0.6"/>
+<circle id="ball" cx="40" cy="280" r="7" fill="var(--accent)"/>
+</svg>
+
+<div class="control"><label for="ang">Ângulo</label><input type="range" id="ang" min="10" max="80" step="1" value="45"><span class="out" id="angOut">45°</span></div>
+<div class="control"><label for="v0">Velocidade inicial</label><input type="range" id="v0" min="10" max="60" step="1" value="35"><span class="out" id="v0Out">35 m/s</span></div>
+<div style="display:flex;align-items:center;margin-top:8px;"><button id="launch">Lançar</button><span id="stats"></span></div>
+
+<h2 class="section">Prompt simples</h2>
+<div class="promptbox"><span class="tag">Básico</span>"Faça uma animação interativa de lançamento de projétil com sliders de ângulo e velocidade inicial."</div>
+
+<h2 class="section">Prompt detalhado</h2>
+<div class="promptbox"><span class="tag">Desenvolvido</span>"Faça uma simulação interativa para a disciplina de Física sobre lançamento de projétil (tiro oblíquo). O usuário controla o ângulo de lançamento e a velocidade inicial com sliders; a trajetória parabólica deve se recalcular em tempo real usando as equações de movimento (desprezando resistência do ar), mostrando o alcance e a altura máxima. Inclua um botão para animar a bolinha percorrendo a trajetória. Nível: básico, focado na relação entre ângulo/velocidade e o formato da curva."</div>
+
+<footer>Protótipo gerado com Claude — parte da oficina Primeiros Passos com o Claude.</footer>
+</div>
+<script>
+(function(){
+var angS=document.getElementById('ang'), v0S=document.getElementById('v0');
+var angOut=document.getElementById('angOut'), v0Out=document.getElementById('v0Out');
+var traj=document.getElementById('traj'), ball=document.getElementById('ball'), stats=document.getElementById('stats');
+var launchBtn=document.getElementById('launch');
+var x0=40, y0=280, g=9.8;
+var raf=null;
+function compute(){
+var ang=parseFloat(angS.value)*Math.PI/180, v0=parseFloat(v0S.value);
+var T=2*v0*Math.sin(ang)/g;
+var R=v0*v0*Math.sin(2*ang)/g;
+var H=v0*v0*Math.sin(ang)*Math.sin(ang)/(2*g);
+var sx=560/Math.max(R,20), sy=210/Math.max(H,8);
+return {ang:ang,v0:v0,T:T,R:R,H:H,sx:sx,sy:sy};
+}
+function draw(){
+angOut.textContent=Math.round(parseFloat(angS.value))+'°';
+v0Out.textContent=parseFloat(v0S.value)+' m/s';
+var c=compute();
+var pts=[]; var steps=60;
+for(var i=0;i<=steps;i++){
+var t=c.T*i/steps;
+var x=c.v0*Math.cos(c.ang)*t;
+var y=c.v0*Math.sin(c.ang)*t-0.5*g*t*t;
+pts.push((x0+x*c.sx)+','+(y0-y*c.sy));
+}
+traj.setAttribute('d','M'+pts.join(' L'));
+ball.setAttribute('cx',x0); ball.setAttribute('cy',y0);
+stats.textContent='Alcance: '+c.R.toFixed(1)+' m — Altura máxima: '+c.H.toFixed(1)+' m';
+return c;
+}
+function launch(){
+if(raf) cancelAnimationFrame(raf);
+var c=draw();
+var start=null;
+function frame(ts){
+if(!start) start=ts;
+var elapsed=(ts-start)/1000;
+var t=Math.min(elapsed, c.T);
+var x=c.v0*Math.cos(c.ang)*t;
+var y=c.v0*Math.sin(c.ang)*t-0.5*g*t*t;
+ball.setAttribute('cx',x0+x*c.sx);
+ball.setAttribute('cy',y0-y*c.sy);
+if(t<c.T){ raf=requestAnimationFrame(frame); }
+}
+raf=requestAnimationFrame(frame);
+}
+angS.addEventListener('input',draw); v0S.addEventListener('input',draw);
+launchBtn.addEventListener('click',launch);
+draw();
+})();
+</script>
+</body>
+</html>

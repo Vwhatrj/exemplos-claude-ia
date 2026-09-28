@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Paleta de Cores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #faf9f6;
+  --surface: #ffffff;
+  --text-primary: #1a1a18;
+  --text-secondary: #6b6a63;
+  --border: #e6e4dd;
+  --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #16161a;
+    --surface: #1e1e23;
+    --text-primary: #f0efe9;
+    --text-secondary: #98968e;
+    --border: #33323a;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #16161a;
+  --surface: #1e1e23;
+  --text-primary: #f0efe9;
+  --text-secondary: #98968e;
+  --border: #33323a;
+}
+* { box-sizing: border-box; }
+body {
+  margin:0;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--sans);
+  padding: 48px 20px 64px;
+}
+.wrap { max-width: 620px; margin: 0 auto; }
+h1 { font-size: 22px; font-weight: 600; margin: 0 0 6px; letter-spacing: -0.01em; }
+.sub { font-size: 14px; color: var(--text-secondary); margin: 0 0 36px; max-width: 46ch; line-height:1.5; }
+.control { display:flex; align-items:center; gap:14px; margin-bottom:32px; }
+.control label { font-size: 13px; color: var(--text-secondary); white-space:nowrap; }
+input[type=range] {
+  flex:1; -webkit-appearance:none; appearance:none; height:4px; border-radius:2px;
+  background: linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red);
+  outline:none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:18px; height:18px; border-radius:50%;
+  background: var(--surface); border:2px solid var(--text-primary); cursor:pointer;
+}
+input[type=range]::-moz-range-thumb {
+  width:18px; height:18px; border-radius:50%; background: var(--surface); border:2px solid var(--text-primary); cursor:pointer; border:2px solid var(--text-primary);
+}
+.hueval { font-family: var(--mono); font-size:13px; min-width:42px; text-align:right; }
+.swatches { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:40px; }
+.swatch { flex: 1 1 90px; text-align:center; }
+.chip { height:64px; border-radius:6px; border:1px solid var(--border); }
+.swatch .label { font-size:11px; color: var(--text-secondary); margin-top:8px; }
+.swatch .hex { font-family: var(--mono); font-size:12px; margin-top:2px; }
+.section-title { font-size:12px; color:var(--text-secondary); margin: 0 0 12px; }
+.card { border-radius:10px; padding:28px; max-width:340px; border:1px solid var(--border); }
+.card h2 { font-size:17px; font-weight:600; margin:0 0 8px; }
+.card p { font-size:13px; line-height:1.55; margin:0 0 18px; }
+.card button { border:none; padding:9px 18px; border-radius:6px; font-size:13px; font-weight:500; font-family:var(--sans); cursor:pointer; }
+footer { margin-top:48px; font-size:12px; color: var(--text-secondary); }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Gerador de paleta de cores</h1>
+<p class="sub">Ajuste o matiz e veja a paleta e um mockup de anúncio se atualizarem juntos.</p>
+
+<div class="control">
+<label for="hue">Matiz</label>
+<input type="range" id="hue" min="0" max="360" step="1" value="200" aria-label="Matiz da paleta, de 0 a 360 graus">
+<span class="hueval" id="hueOut">200°</span>
+</div>
+
+<p class="section-title">Paleta</p>
+<div class="swatches" id="swatches"></div>
+
+<p class="section-title">Aplicação — mockup de anúncio</p>
+<div class="card" id="card">
+<h2 id="cardTitle">Título do anúncio</h2>
+<p id="cardBody">Descrição curta do produto ou serviço aqui.</p>
+<button id="cardBtn">Saiba mais</button>
+</div>
+
+<footer>Protótipo gerado com Claude — parte da oficina Primeiros Passos com o Claude.</footer>
+</div>
+
+<script>
+(function(){
+var hue=document.getElementById('hue');
+var hueOut=document.getElementById('hueOut');
+var swatchesEl=document.getElementById('swatches');
+var cardEl=document.getElementById('card');
+var cardTitle=document.getElementById('cardTitle');
+var cardBody=document.getElementById('cardBody');
+var cardBtn=document.getElementById('cardBtn');
+
+function hslToHex(h,s,l){
+s/=100; l/=100;
+function k(n){return (n+h/30)%12;}
+var a=s*Math.min(l,1-l);
+function f(n){return l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));}
+function toHex(x){var v=Math.round(255*x).toString(16); return v.length===1?'0'+v:v;}
+return '#'+toHex(f(0))+toHex(f(8))+toHex(f(4));
+}
+
+function render(h){
+h=((h%360)+360)%360;
+var palette=[
+{label:'Base', hex:hslToHex(h,65,55)},
+{label:'Clara', hex:hslToHex(h,45,90)},
+{label:'Escura', hex:hslToHex(h,55,25)},
+{label:'Complementar', hex:hslToHex((h+180)%360,60,50)},
+{label:'Destaque', hex:hslToHex((h+30)%360,70,60)}
+];
+swatchesEl.innerHTML='';
+palette.forEach(function(p){
+var col=document.createElement('div');
+col.className='swatch';
+var box=document.createElement('div');
+box.className='chip';
+box.style.background=p.hex;
+var lbl=document.createElement('div');
+lbl.className='label';
+lbl.textContent=p.label;
+var hx=document.createElement('div');
+hx.className='hex';
+hx.textContent=p.hex;
+col.appendChild(box); col.appendChild(lbl); col.appendChild(hx);
+swatchesEl.appendChild(col);
+});
+cardEl.style.background=palette[1].hex;
+cardTitle.style.color=palette[2].hex;
+cardBody.style.color=palette[2].hex;
+cardBtn.style.background=palette[0].hex;
+cardBtn.style.color='#ffffff';
+hueOut.textContent=Math.round(h)+'°';
+try{ localStorage.setItem('paleta-hue', String(h)); }catch(e){}
+}
+
+hue.addEventListener('input', function(){ render(parseFloat(hue.value)); });
+
+var startHue=200;
+try{
+var saved=localStorage.getItem('paleta-hue');
+if(saved !== null && !isNaN(parseFloat(saved))) startHue=parseFloat(saved);
+}catch(e){}
+hue.value=startHue;
+render(startHue);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Psicologia — Estágios de Piaget</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;--bg:#faf9f6;--surface:#ffffff;--text:#1a1a18;--muted:#6b6a63;--border:#e6e4dd;--accent:#3d5a98;--mono:'SFMono-Regular',Consolas,Menlo,monospace;--sans:'Inter',-apple-system,'Segoe UI',sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}}
+:root[data-theme="dark"]{--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);padding:40px 20px 60px;}
+.wrap{max-width:640px;margin:0 auto;}
+h1{font-size:22px;font-weight:600;margin:0 0 6px;letter-spacing:-0.01em;}
+.sub{font-size:14px;color:var(--muted);margin:0 0 28px;line-height:1.5;}
+input[type=range]{width:100%;accent-color:var(--accent);}
+#ageOut{font-size:13px;color:var(--muted);margin:8px 0 20px;}
+.card{border-radius:10px;border:1px solid var(--border);padding:20px;}
+.card p.name{font-size:17px;font-weight:600;margin:0 0 4px;}
+.card p.range{font-size:12px;color:var(--muted);margin:0 0 12px;}
+.card p.desc{font-size:14px;line-height:1.55;margin:0;}
+h2.section{font-size:12px;color:var(--muted);margin:32px 0 12px;text-transform:uppercase;letter-spacing:.04em;}
+.promptbox{border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-size:13px;line-height:1.55;margin-bottom:12px;background:var(--surface);}
+.promptbox .tag{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px;display:block;}
+footer{margin-top:40px;font-size:12px;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Psicologia/Pedagogia — Estágios de Piaget</h1>
+<p class="sub">Ajuste a idade e veja o estágio de desenvolvimento correspondente e suas características.</p>
+
+<div style="position:relative;height:4px;background:var(--border);border-radius:2px;margin-top:30px;">
+<div id="track" style="position:absolute;left:0;top:0;height:4px;background:var(--accent);border-radius:2px;"></div>
+</div>
+<input type="range" id="age" min="0" max="18" step="1" value="4" aria-label="Idade em anos">
+<p id="ageOut"></p>
+<div class="card">
+<p class="name" id="stageName"></p>
+<p class="range" id="stageRange"></p>
+<p class="desc" id="stageDesc"></p>
+</div>
+
+<h2 class="section">Prompt simples</h2>
+<div class="promptbox"><span class="tag">Básico</span>"Faça uma linha do tempo interativa dos estágios de desenvolvimento de Piaget, navegável por idade."</div>
+
+<h2 class="section">Prompt detalhado</h2>
+<div class="promptbox"><span class="tag">Desenvolvido</span>"Faça uma simulação interativa para a disciplina de Psicologia do Desenvolvimento sobre os estágios de Piaget. O usuário navega por idade (0 a 18 anos) com um slider; ao mudar a idade, deve aparecer o estágio correspondente (sensório-motor, pré-operatório, operatório concreto, operatório formal), a faixa etária aproximada e uma breve descrição da principal característica cognitiva daquele estágio. Deixe claro que as faixas são referências aproximadas. Nível: básico, para apresentar a teoria de forma visual e navegável."</div>
+
+<footer>Protótipo gerado com Claude — parte da oficina Primeiros Passos com o Claude.</footer>
+</div>
+<script>
+(function(){
+var stages=[
+{min:0,max:2,n:'Sensório-motor', d:'A criança conhece o mundo pelos sentidos e por ações motoras. Surge a noção de permanência do objeto — saber que algo existe mesmo fora da vista.'},
+{min:2,max:7,n:'Pré-operatório', d:'Surge o pensamento simbólico e a linguagem. O raciocínio ainda é egocêntrico e intuitivo, sem lógica reversível — é a fase do "faz de conta".'},
+{min:7,max:11,n:'Operatório concreto', d:'A criança consegue raciocinar logicamente sobre objetos concretos, entende conservação de quantidade e classifica e ordena elementos.'},
+{min:11,max:19,n:'Operatório formal', d:'Surge o pensamento abstrato e hipotético-dedutivo — a pessoa consegue raciocinar sobre possibilidades, não só sobre o concreto.'}
+];
+var slider=document.getElementById('age');
+var track=document.getElementById('track');
+var ageOut=document.getElementById('ageOut');
+var nameEl=document.getElementById('stageName'), rangeEl=document.getElementById('stageRange'), descEl=document.getElementById('stageDesc');
+function stageFor(age){ for(var i=0;i<stages.length;i++){ if(age<stages[i].max || i===stages.length-1) return stages[i]; } }
+function update(){
+var age=parseInt(slider.value,10);
+track.style.width=(age/18*100)+'%';
+ageOut.textContent=age+' anos';
+var s=stageFor(age);
+nameEl.textContent=s.n;
+rangeEl.textContent=s.min+' a '+(s.max>18?'18+':s.max)+' anos (referência aproximada)';
+descEl.textContent=s.d;
+}
+slider.addEventListener('input',update);
+update();
+})();
+</script>
+</body>
+</html>

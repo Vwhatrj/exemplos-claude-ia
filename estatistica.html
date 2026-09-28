@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Estatística — Distribuição Normal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;--bg:#faf9f6;--surface:#ffffff;--text:#1a1a18;--muted:#6b6a63;--border:#e6e4dd;--accent:#3d5a98;--danger:#c8453a;--mono:'SFMono-Regular',Consolas,Menlo,monospace;--sans:'Inter',-apple-system,'Segoe UI',sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}}
+:root[data-theme="dark"]{--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);padding:40px 20px 60px;}
+.wrap{max-width:640px;margin:0 auto;}
+h1{font-size:22px;font-weight:600;margin:0 0 6px;letter-spacing:-0.01em;}
+.sub{font-size:14px;color:var(--muted);margin:0 0 28px;line-height:1.5;}
+svg{width:100%;height:auto;display:block;margin-bottom:16px;}
+.control{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.control label{font-size:13px;color:var(--muted);min-width:150px;}
+input[type=range]{flex:1;accent-color:var(--accent);}
+.out{font-size:13px;font-weight:500;min-width:40px;text-align:right;}
+h2.section{font-size:12px;color:var(--muted);margin:32px 0 12px;text-transform:uppercase;letter-spacing:.04em;}
+.promptbox{border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-size:13px;line-height:1.55;margin-bottom:12px;background:var(--surface);}
+.promptbox .tag{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px;display:block;}
+footer{margin-top:40px;font-size:12px;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Estatística — Distribuição Normal</h1>
+<p class="sub">Ajuste a média e o desvio-padrão e veja a curva de sino se mover e mudar de largura.</p>
+
+<svg id="chart" viewBox="0 0 640 300" role="img">
+<title>Curva de distribuição normal</title>
+<line x1="40" y1="250" x2="620" y2="250" stroke="var(--border)" stroke-width="1"/>
+<path id="area" d="" fill="var(--accent)" opacity="0.15"/>
+<path id="curve" d="" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+<line id="meanLine" x1="0" y1="30" x2="0" y2="250" stroke="var(--text)" stroke-width="1" stroke-dasharray="4 4"/>
+</svg>
+
+<div class="control"><label for="mean">Média (μ)</label><input type="range" id="mean" min="10" max="90" step="1" value="50"><span class="out" id="meanOut">50</span></div>
+<div class="control"><label for="std">Desvio-padrão (σ)</label><input type="range" id="std" min="2" max="25" step="0.5" value="10"><span class="out" id="stdOut">10</span></div>
+
+<h2 class="section">Prompt simples</h2>
+<div class="promptbox"><span class="tag">Básico</span>"Faça um simulador interativo de distribuição normal com sliders de média e desvio-padrão."</div>
+
+<h2 class="section">Prompt detalhado</h2>
+<div class="promptbox"><span class="tag">Desenvolvido</span>"Faça uma simulação interativa para a disciplina de Estatística sobre distribuição normal. O usuário controla a média e o desvio-padrão com dois sliders; a curva de sino deve se mover horizontalmente com a média e mudar de largura/altura com o desvio-padrão, mantendo a área sob a curva coerente com uma densidade de probabilidade. Marque visualmente a posição da média. Nível: básico, para demonstrar o formato da curva, sem exigir dados reais."</div>
+
+<footer>Protótipo gerado com Claude — parte da oficina Primeiros Passos com o Claude.</footer>
+</div>
+<script>
+(function(){
+var meanS=document.getElementById('mean'), stdS=document.getElementById('std');
+var meanOut=document.getElementById('meanOut'), stdOut=document.getElementById('stdOut');
+var curve=document.getElementById('curve'), area=document.getElementById('area'), meanLine=document.getElementById('meanLine');
+var x0=40, x1=620, y0=250, plotW=x1-x0, plotH=220, xMin=0, xMax=100;
+var peakMax = 1/(2*Math.sqrt(2*Math.PI));
+var k = plotH/peakMax;
+function pdf(x,m,s){ return (1/(s*Math.sqrt(2*Math.PI)))*Math.exp(-0.5*Math.pow((x-m)/s,2)); }
+function sx(x){ return x0 + ((x-xMin)/(xMax-xMin))*plotW; }
+function sy(y){ return y0 - y*k; }
+function update(){
+var m=parseFloat(meanS.value), s=parseFloat(stdS.value);
+meanOut.textContent=m; stdOut.textContent=s;
+var pts=[]; var steps=100;
+for(var i=0;i<=steps;i++){ var x=xMin+(xMax-xMin)*i/steps; var y=pdf(x,m,s); pts.push(sx(x)+','+sy(y)); }
+curve.setAttribute('d','M'+pts.join(' L'));
+area.setAttribute('d','M'+sx(xMin)+','+y0+' L'+pts.join(' L')+' L'+sx(xMax)+','+y0+' Z');
+meanLine.setAttribute('x1',sx(m)); meanLine.setAttribute('x2',sx(m));
+}
+meanS.addEventListener('input',update); stdS.addEventListener('input',update);
+update();
+})();
+</script>
+</body>
+</html>

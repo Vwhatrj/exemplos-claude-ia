@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>História — Linha do Tempo por Período</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;--bg:#faf9f6;--surface:#ffffff;--text:#1a1a18;--muted:#6b6a63;--border:#e6e4dd;--accent:#3d5a98;--mono:'SFMono-Regular',Consolas,Menlo,monospace;--sans:'Inter',-apple-system,'Segoe UI',sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}}
+:root[data-theme="dark"]{--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);padding:40px 20px 60px;}
+.wrap{max-width:640px;margin:0 auto;}
+h1{font-size:22px;font-weight:600;margin:0 0 6px;letter-spacing:-0.01em;}
+.sub{font-size:14px;color:var(--muted);margin:0 0 24px;line-height:1.5;}
+#eraBtns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+#eraBtns button{font:inherit;font-size:13px;border-radius:16px;padding:6px 14px;cursor:pointer;background:var(--surface);border:1px solid var(--border);color:var(--text);}
+.evrow{display:flex;gap:16px;margin-bottom:12px;align-items:baseline;}
+.evrow .y{font-family:var(--mono);font-size:13px;color:var(--accent);min-width:80px;}
+.evrow .t{font-size:14px;}
+h2.section{font-size:12px;color:var(--muted);margin:32px 0 12px;text-transform:uppercase;letter-spacing:.04em;}
+.promptbox{border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-size:13px;line-height:1.55;margin-bottom:12px;background:var(--surface);}
+.promptbox .tag{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px;display:block;}
+footer{margin-top:40px;font-size:12px;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>História — Linha do Tempo por Período</h1>
+<p class="sub">Escolha o período e veja eventos marcantes daquela era.</p>
+
+<div id="eraBtns"></div>
+<div id="events"></div>
+
+<h2 class="section">Prompt simples</h2>
+<div class="promptbox"><span class="tag">Básico</span>"Faça uma linha do tempo interativa de eventos históricos, filtrável por período."</div>
+
+<h2 class="section">Prompt detalhado</h2>
+<div class="promptbox"><span class="tag">Desenvolvido</span>"Faça uma simulação interativa para a disciplina de História sobre grandes períodos históricos (Idade Antiga, Média, Moderna e Contemporânea). O usuário seleciona o período clicando em botões; ao selecionar, devem aparecer 2 ou 3 eventos marcantes daquele período com a data e uma breve descrição. Nível: básico, para dar uma visão panorâmica dos períodos, não substituindo o estudo aprofundado de cada evento."</div>
+
+<footer>Protótipo gerado com Claude — parte da oficina Primeiros Passos com o Claude.</footer>
+</div>
+<script>
+(function(){
+var eras=[
+{n:'Idade Antiga', r:'até 476 d.C.', ev:[
+{y:'~3200 a.C.', t:'Invenção da escrita cuneiforme na Mesopotâmia.'},
+{y:'508 a.C.', t:'Início da democracia em Atenas.'},
+{y:'27 a.C.', t:'Início do Império Romano com Augusto.'}
+]},
+{n:'Idade Média', r:'476–1453', ev:[
+{y:'476', t:'Queda do Império Romano do Ocidente.'},
+{y:'1096', t:'Início das Cruzadas.'},
+{y:'1347', t:'Peste Negra se espalha pela Europa.'}
+]},
+{n:'Idade Moderna', r:'1453–1789', ev:[
+{y:'1492', t:'Chegada de Cristóvão Colombo à América.'},
+{y:'1517', t:'Reforma Protestante, iniciada por Lutero.'},
+{y:'1789', t:'Início da Revolução Francesa.'}
+]},
+{n:'Idade Contemporânea', r:'1789–hoje', ev:[
+{y:'1914', t:'Início da Primeira Guerra Mundial.'},
+{y:'1969', t:'Chegada do ser humano à Lua.'},
+{y:'1989', t:'Queda do Muro de Berlim.'}
+]}
+];
+var btnsEl=document.getElementById('eraBtns'), eventsEl=document.getElementById('events');
+var current=0;
+eras.forEach(function(e,i){ var b=document.createElement('button'); b.textContent=e.n; b.dataset.idx=i; btnsEl.appendChild(b); });
+function render(){
+Array.prototype.forEach.call(btnsEl.children,function(b,i){
+b.style.background = i===current ? 'var(--accent)' : 'var(--surface)';
+b.style.color = i===current ? '#ffffff' : 'var(--text)';
+b.style.borderColor = i===current ? 'var(--accent)' : 'var(--border)';
+});
+var e=eras[current];
+eventsEl.innerHTML='<p style="font-size:12px;color:var(--muted);margin:0 0 14px;">'+e.r+'</p>';
+e.ev.forEach(function(item){
+var row=document.createElement('div'); row.className='evrow';
+var y=document.createElement('span'); y.className='y'; y.textContent=item.y;
+var t=document.createElement('span'); t.className='t'; t.textContent=item.t;
+row.appendChild(y); row.appendChild(t);
+eventsEl.appendChild(row);
+});
+}
+btnsEl.addEventListener('click',function(ev){ if(ev.target.tagName==='BUTTON'){ current=parseInt(ev.target.dataset.idx,10); render(); } });
+render();
+})();
+</script>
+</body>
+</html>

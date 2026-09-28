@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Letras — Movimentos Literários</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;--bg:#faf9f6;--surface:#ffffff;--text:#1a1a18;--muted:#6b6a63;--border:#e6e4dd;--accent:#3d5a98;--mono:'SFMono-Regular',Consolas,Menlo,monospace;--sans:'Inter',-apple-system,'Segoe UI',sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}}
+:root[data-theme="dark"]{--bg:#15151a;--surface:#1e1e23;--text:#f0efe9;--muted:#98968e;--border:#33323a;--accent:#8fa8e0;}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);padding:40px 20px 60px;}
+.wrap{max-width:640px;margin:0 auto;}
+h1{font-size:22px;font-weight:600;margin:0 0 6px;letter-spacing:-0.01em;}
+.sub{font-size:14px;color:var(--muted);margin:0 0 28px;line-height:1.5;}
+input[type=range]{width:100%;accent-color:var(--accent);}
+.card{border-radius:10px;border:1px solid var(--border);padding:20px;margin-top:16px;}
+.card p.name{font-size:17px;font-weight:600;margin:0 0 4px;}
+.card p.period{font-size:12px;color:var(--muted);margin:0 0 12px;}
+.card p.desc{font-size:14px;line-height:1.55;margin:0;}
+h2.section{font-size:12px;color:var(--muted);margin:32px 0 12px;text-transform:uppercase;letter-spacing:.04em;}
+.promptbox{border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-size:13px;line-height:1.55;margin-bottom:12px;background:var(--surface);}
+.promptbox .tag{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px;display:block;}
+footer{margin-top:40px;font-size:12px;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Letras — Movimentos Literários</h1>
+<p class="sub">Mova o controle e veja as características de cada movimento, do Barroco ao Contemporâneo.</p>
+
+<div style="position:relative;height:4px;background:var(--border);border-radius:2px;margin-top:30px;">
+<div id="track" style="position:absolute;left:0;top:0;height:4px;background:var(--accent);border-radius:2px;"></div>
+</div>
+<input type="range" id="mov" min="0" max="6" step="1" value="0" aria-label="Movimento literário">
+
+<div class="card">
+<p class="name" id="movName"></p>
+<p class="period" id="movPeriod"></p>
+<p class="desc" id="movDesc"></p>
+</div>
+
+<h2 class="section">Prompt simples</h2>
+<div class="promptbox"><span class="tag">Básico</span>"Faça uma linha do tempo interativa dos movimentos literários (do Barroco ao Contemporâneo), mostrando as características de cada um ao mover o slider."</div>
+
+<h2 class="section">Prompt detalhado</h2>
+<div class="promptbox"><span class="tag">Desenvolvido</span>"Faça uma simulação interativa para a disciplina de Letras sobre os movimentos literários. O usuário navega pelos movimentos (Barroco, Arcadismo, Romantismo, Realismo/Naturalismo, Simbolismo, Modernismo, Contemporâneo) com um slider; cada movimento deve mostrar o período aproximado e uma breve descrição das principais características estéticas e temáticas. Nível: básico, para dar visão panorâmica da evolução dos estilos, sem aprofundar em autores e obras específicas."</div>
+
+<footer>Protótipo gerado com Claude — parte da oficina Primeiros Passos com o Claude.</footer>
+</div>
+<script>
+(function(){
+var movs=[
+{n:'Barroco', p:'Séc. XVII', d:'Marcado pelo conflito entre razão e fé, prazer e culpa. Linguagem rebuscada, cultismo e conceptismo, forte presença religiosa.'},
+{n:'Arcadismo', p:'Séc. XVIII', d:'Reação ao Barroco: busca a simplicidade, a vida bucólica (fugere urbem) e o equilíbrio racional inspirado nos clássicos.'},
+{n:'Romantismo', p:'Séc. XIX (1ª metade)', d:'Valoriza a emoção, o individualismo, o nacionalismo e a idealização — do amor, da natureza e do herói.'},
+{n:'Realismo/Naturalismo', p:'Séc. XIX (2ª metade)', d:'Retrata a sociedade de forma crítica e objetiva; o Naturalismo acentua o determinismo biológico e social dos personagens.'},
+{n:'Simbolismo', p:'Fim do séc. XIX', d:'Valoriza o subjetivo, o musical e o sugestivo na linguagem, em oposição à objetividade realista.'},
+{n:'Modernismo', p:'Séc. XX', d:'Rompe com as formas tradicionais, experimenta a linguagem coloquial e o verso livre, e busca uma identidade nacional renovada.'},
+{n:'Contemporâneo', p:'Do final do séc. XX até hoje', d:'Pluralidade de estilos e temas, hibridismo de gêneros, forte diálogo com questões sociais e identitárias atuais.'}
+];
+var slider=document.getElementById('mov');
+var track=document.getElementById('track');
+var nameEl=document.getElementById('movName'), periodEl=document.getElementById('movPeriod'), descEl=document.getElementById('movDesc');
+function update(){
+var idx=parseInt(slider.value,10);
+track.style.width=(idx/(movs.length-1)*100)+'%';
+nameEl.textContent=movs[idx].n; periodEl.textContent=movs[idx].p; descEl.textContent=movs[idx].d;
+}
+slider.addEventListener('input',update);
+update();
+})();
+</script>
+</body>
+</html>
